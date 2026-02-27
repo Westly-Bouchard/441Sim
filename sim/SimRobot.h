@@ -45,7 +45,7 @@ public:
 
     [[nodiscard]] Pose getPose() const;
 
-    void setInputs(double FL, double FR, double BL, double BR);
+    void setInputs(int FL, int FR, int BL, int BR);
 };
 
 

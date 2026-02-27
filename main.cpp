@@ -44,14 +44,16 @@ int main() {
 
         accumulator += frame_dt;
 
+        // robot.setInputs(255, 255, 255, 255);
+
         if (ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
-            robot.setInputs(0.01, -0.01, 0.01, -0.01);
+            robot.setInputs(255, 255, 255, 255);
         } else if (ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
-            robot.setInputs(-0.01, 0.01, 0.01, -0.01);
+            robot.setInputs(-255, -255, -255, -255);
         } else if (ImGui::IsKeyDown(ImGuiKey_LeftArrow)) {
-            robot.setInputs(-0.01, -0.01, -0.01, -0.01);
+            robot.setInputs(-255, 255, -255, 255);
         } else if (ImGui::IsKeyDown(ImGuiKey_RightArrow)) {
-            robot.setInputs(0.01, 0.01, 0.01, 0.01);
+            robot.setInputs(255, -255, 255, -255);
         } else {
             robot.setInputs(0, 0, 0, 0);
         }

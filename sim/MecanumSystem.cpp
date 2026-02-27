@@ -51,9 +51,9 @@ void MecanumSystem::operator()(const state_t &x, state_t &dxdt, const double t) 
     // const double fYWorld = sin(theta) * fXBody + cos(theta) * fYBody;
     // const double tZWorld = tZ;
 
-    const double bFy = (tau_1 - tau_2 + tau_3 - tau_4) / r;
-    const double bFx = (-tau_1 -tau_2 + tau_3 + tau_4) / r;
-    const double bTz = -(sX + sY) * (tau_1 + tau_2 + tau_3 + tau_4) / r;
+    const double bFy = (tau_1 + tau_2 + tau_3 + tau_4) / r;
+    const double bFx = (-tau_1 + tau_2 + tau_3 - tau_4) / r;
+    const double bTz = -(sX + sY) * (tau_1 - tau_2 + tau_3 - tau_4) / r;
 
     const double s = sin(x.at(2));
     const double c = cos(x.at(2));

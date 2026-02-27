@@ -111,7 +111,7 @@ inline void drawRobotWindow(Pose p) {
     // Rotate and translate each corner
     for (int i = 0; i < 4; i++) {
         points[i].x = cursor.x + (p.x + (v[i].x * cos_a - v[i].y * sin_a)) * PX_PER_METER;
-        points[i].y = cursor.y + (p.y + (v[i].x * sin_a + v[i].y * cos_a)) * PX_PER_METER;
+        points[i].y = cursor.y + (3.0 - p.y - (v[i].x * sin_a + v[i].y * cos_a)) * PX_PER_METER;
     }
 
     draw_list->AddConvexPolyFilled(points, 4, ImColor(255, 255, 255));

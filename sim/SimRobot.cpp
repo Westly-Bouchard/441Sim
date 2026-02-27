@@ -16,18 +16,26 @@ SimRobot::SimRobot(Pose initialPose, const double dt) : sys(
     state = {initialPose.x, initialPose.y, initialPose.theta, 0, 0, 0};
 
     motors = {
-        SimMotor(kV, kT, r, true),
-        SimMotor(kV, kT, r, false),
-        SimMotor(kV, kT, r, true),
-        SimMotor(kV, kT, r, false)
+        SimMotor(kV, kT, r),
+        SimMotor(kV, kT, r),
+        SimMotor(kV, kT, r),
+        SimMotor(kV, kT, r)
     };
 }
 
 void SimRobot::update(double& acc) {
-    const double omega_1 = (1 / wheelRadius) * (state.at(3) - state.at(4) - (sX + sY) * state.at(5));
-    const double omega_2 = (1 / wheelRadius) * (state.at(3) + state.at(4) + (sX + sY) * state.at(5));
-    const double omega_3 = (1 / wheelRadius) * (state.at(3) + state.at(4) - (sX + sY) * state.at(5));
-    const double omega_4 = (1 / wheelRadius) * (state.at(3) - state.at(4) + (sX + sY) * state.at(5));
+    if (acc <= dt) return;
+    // Need body frame velocities for kinematics
+    const double c = cos(state.at(2));
+    const double s = sin(state.at(2));
+
+    const double bVy = state.at(4) * c - state.at(3) * s;
+    const double bVx = state.at(3) * c + state.at(4) * s;
+
+    const double omega_1 = (1 / wheelRadius) * (bVy - bVx - (sX + sY) * state.at(5));
+    const double omega_2 = (1 / wheelRadius) * (bVy + bVx + (sX + sY) * state.at(5));
+    const double omega_3 = (1 / wheelRadius) * (bVy + bVx - (sX + sY) * state.at(5));
+    const double omega_4 = (1 / wheelRadius) * (bVy - bVx + (sX + sY) * state.at(5));
 
     // std::cout << omega_1 << std::endl;
 
@@ -60,7 +68,7 @@ Pose SimRobot::getPose() const {
     return {state.at(0), state.at(1), state.at(2)};
 }
 
-void SimRobot::setInputs(const double FL, const double FR, const double BL, const double BR) {
+void SimRobot::setInputs(const int FL, const int FR, const int BL, const int BR) {
     motors.at(0).setInput(FL);
     motors.at(1).setInput(FR);
     motors.at(2).setInput(BL);

@@ -27,12 +27,10 @@ class SimMotor {
     // Current state
     double omega;
 
-    bool inverted;
-
 public:
-    SimMotor(double kV, double kT, double r, bool inverted);
+    SimMotor(double kV, double kT, double r);
 
-    void setInput(double pwm);
+    void setInput(int pwm);
     void setSpeed(double speed);
 
     [[nodiscard]] double getTorque() const;
