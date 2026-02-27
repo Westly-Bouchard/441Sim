@@ -1,10 +1,6 @@
 #include <iostream>
 #include <optional>
-#include <vector>
-#include <cmath>
 using namespace std;
-
-#include "SimRobot.h"
 
 #include <imgui_impl_glfw.h>
 #define GL_SILENCE_DEPRECATION
@@ -17,8 +13,9 @@ using namespace std;
 
 #include "draw.h"
 #include "graphics.h"
-#include "MecanumSystem.h"
 #include "util.h"
+
+#include "sim/SimRobot.h"
 
 
 int main() {
@@ -47,19 +44,21 @@ int main() {
 
         accumulator += frame_dt;
 
-        if (ImGui::IsKeyPressed(ImGuiKey_UpArrow)) {
-            robot.setInputs(-0.05, -0.05, -0.05, -0.05);
-        } else if (ImGui::IsKeyPressed(ImGuiKey_DownArrow)) {
-            robot.setInputs(0.05, 0.05, 0.05, 0.05);
-        } else if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow)) {
-            robot.setInputs(0.05, -0.05, -0.05, 0.05);
-        } else if (ImGui::IsKeyPressed(ImGuiKey_RightArrow)) {
-            robot.setInputs(-0.05, 0.05, 0.05, -0.05);
+        if (ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
+            robot.setInputs(-255, -255, -255, -255);
+        } else if (ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
+            robot.setInputs(255, 255, 255, 255);
+        } else if (ImGui::IsKeyDown(ImGuiKey_LeftArrow)) {
+            robot.setInputs(255, -255, -255, 255);
+        } else if (ImGui::IsKeyDown(ImGuiKey_RightArrow)) {
+            robot.setInputs(-255, 255, 255, -255);
         } else {
-            robot.setInputs(0.0, 0.0, 0.0, 0.0);
+            robot.setInputs(0, 0, 0, 0);
         }
 
         robot.update(accumulator);
+
+        cout << robot.getState().at(4) << endl;
 
 
         /* RENDERING */

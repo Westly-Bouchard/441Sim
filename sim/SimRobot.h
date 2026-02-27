@@ -7,8 +7,9 @@
 
 #include <boost/numeric/odeint.hpp>
 
+#include "SimMotor.h"
 #include "MecanumSystem.h"
-#include "util.h"
+#include "../util.h"
 
 using stepper_t = boost::numeric::odeint::runge_kutta4<state_t>;
 
@@ -33,6 +34,8 @@ class SimRobot {
 
     state_t state;
 
+    std::vector<SimMotor> motors;
+
 public:
     explicit SimRobot(Pose initialPose, double dt);
 
@@ -40,9 +43,9 @@ public:
 
     state_t& getState();
 
-    Pose getPose() const;
+    [[nodiscard]] Pose getPose() const;
 
-    void setInputs(double FL, double FR, double BL, double BR);
+    void setInputs(int FL, int FR, int BL, int BR);
 };
 
 

@@ -15,10 +15,12 @@ add_executable(441Sim main.cpp
         graphics.h
         util.h
         draw.h
-        MecanumSystem.h
-        MecanumSystem.cpp
-        SimRobot.cpp
-        SimRobot.h)
+        sim/MecanumSystem.h
+        sim/MecanumSystem.cpp
+        sim/SimRobot.cpp
+        sim/SimRobot.h
+        sim/SimMotor.cpp
+        sim/SimMotor.h)
 
 target_include_directories(441Sim PRIVATE ${Boost_INCLUDE_DIRS})
 
