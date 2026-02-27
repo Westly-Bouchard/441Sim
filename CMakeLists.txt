@@ -9,7 +9,7 @@ find_package(glfw3 CONFIG REQUIRED)
 
 find_package(Boost REQUIRED)
 
-add_subdirectory(external/imgui)
+add_subdirectory(external)
 
 add_executable(441Sim main.cpp
         graphics.h
