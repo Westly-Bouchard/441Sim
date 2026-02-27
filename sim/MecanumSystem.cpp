@@ -40,23 +40,33 @@ void MecanumSystem::setTorques(const double FL, const double FR, const double BL
 }
 
 void MecanumSystem::operator()(const state_t &x, state_t &dxdt, const double t) const {
-
     // Body frame forces
-    const double fXBody = (tau_1 + tau_2 + tau_3 + tau_4) / r;
-    const double fYBody = -1.0 * (tau_1 - tau_2 - tau_3 + tau_4) / r;
-    const double tZ = -1.0 * (sX + sY) * (tau_1 - tau_2 + tau_3 - tau_4) / r;
+    // const double fXBody = (tau_1 + tau_2 + tau_3 + tau_4) / r;
+    // const double fYBody = -1.0 * (tau_1 - tau_2 - tau_3 + tau_4) / r;
+    // const double tZ = -1.0 * (sX + sY) * (tau_1 - tau_2 + tau_3 - tau_4) / r;
+    //
+    // // Rotate them into the world frame
+    // const double theta = x.at(2);
+    // const double fXWorld = cos(theta) * fXBody - sin(theta) * fYBody;
+    // const double fYWorld = sin(theta) * fXBody + cos(theta) * fYBody;
+    // const double tZWorld = tZ;
 
-    // Rotate them into the world frame
-    const double theta = x.at(2);
-    const double fXWorld = cos(theta) * fXBody - sin(theta) * fYBody;
-    const double fYWorld = sin(theta) * fXBody + cos(theta) * fYBody;
-    const double tZWorld = tZ;
+    const double bFy = (tau_1 - tau_2 + tau_3 - tau_4) / r;
+    const double bFx = (-tau_1 -tau_2 + tau_3 + tau_4) / r;
+    const double bTz = -(sX + sY) * (tau_1 + tau_2 + tau_3 + tau_4) / r;
+
+    const double s = sin(x.at(2));
+    const double c = cos(x.at(2));
+
+    const double wFy = bFy * c + bFx * s;
+    const double wFx = bFx * c - bFy * s;
+    const double wTz = bTz;
 
     dxdt.at(0) = x.at(3);
     dxdt.at(1) = x.at(4);
     dxdt.at(2) = x.at(5);
 
-    dxdt.at(3) = (1.0 / m_e) * fXWorld;
-    dxdt.at(4) = (1.0 / m_e) * fYWorld;
-    dxdt.at(5) = (1.0 / I_e) * tZWorld;
+    dxdt.at(3) = (1.0 / m_e) * wFx;
+    dxdt.at(4) = (1.0 / m_e) * wFy;
+    dxdt.at(5) = (1.0 / I_e) * wTz;
 }

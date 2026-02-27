@@ -16,10 +16,10 @@ SimRobot::SimRobot(Pose initialPose, const double dt) : sys(
     state = {initialPose.x, initialPose.y, initialPose.theta, 0, 0, 0};
 
     motors = {
-        SimMotor(kV, kT, r),
-        SimMotor(kV, kT, r),
-        SimMotor(kV, kT, r),
-        SimMotor(kV, kT, r)
+        SimMotor(kV, kT, r, true),
+        SimMotor(kV, kT, r, false),
+        SimMotor(kV, kT, r, true),
+        SimMotor(kV, kT, r, false)
     };
 }
 
@@ -28,6 +28,8 @@ void SimRobot::update(double& acc) {
     const double omega_2 = (1 / wheelRadius) * (state.at(3) + state.at(4) + (sX + sY) * state.at(5));
     const double omega_3 = (1 / wheelRadius) * (state.at(3) + state.at(4) - (sX + sY) * state.at(5));
     const double omega_4 = (1 / wheelRadius) * (state.at(3) - state.at(4) + (sX + sY) * state.at(5));
+
+    // std::cout << omega_1 << std::endl;
 
     motors.at(0).setSpeed(omega_1);
     motors.at(1).setSpeed(omega_2);
@@ -46,6 +48,8 @@ void SimRobot::update(double& acc) {
         simTime += dt;
         acc -= dt;
     }
+
+    std::cout << state.at(1) << std::endl;
 }
 
 state_t& SimRobot::getState() {
@@ -53,10 +57,10 @@ state_t& SimRobot::getState() {
 }
 
 Pose SimRobot::getPose() const {
-    return {state.at(1), state.at(0), state.at(2)};
+    return {state.at(0), state.at(1), state.at(2)};
 }
 
-void SimRobot::setInputs(const int FL, const int FR, const int BL, const int BR) {
+void SimRobot::setInputs(const double FL, const double FR, const double BL, const double BR) {
     motors.at(0).setInput(FL);
     motors.at(1).setInput(FR);
     motors.at(2).setInput(BL);

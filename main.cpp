@@ -29,7 +29,7 @@ int main() {
         return 1;
     }
 
-    auto robot = SimRobot({1, 1, 0}, 0.002);
+    auto robot = SimRobot({1.5, 1.5, 0}, 0.002);
 
     double accumulator = 0.0;
 
@@ -45,20 +45,18 @@ int main() {
         accumulator += frame_dt;
 
         if (ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
-            robot.setInputs(-255, -255, -255, -255);
+            robot.setInputs(0.01, -0.01, 0.01, -0.01);
         } else if (ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
-            robot.setInputs(255, 255, 255, 255);
+            robot.setInputs(-0.01, 0.01, 0.01, -0.01);
         } else if (ImGui::IsKeyDown(ImGuiKey_LeftArrow)) {
-            robot.setInputs(255, -255, -255, 255);
+            robot.setInputs(-0.01, -0.01, -0.01, -0.01);
         } else if (ImGui::IsKeyDown(ImGuiKey_RightArrow)) {
-            robot.setInputs(-255, 255, 255, -255);
+            robot.setInputs(0.01, 0.01, 0.01, 0.01);
         } else {
             robot.setInputs(0, 0, 0, 0);
         }
 
         robot.update(accumulator);
-
-        cout << robot.getState().at(4) << endl;
 
 
         /* RENDERING */

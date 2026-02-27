@@ -22,15 +22,17 @@ inline double kV = freeSpeed / (vBus - freeCurrent * r);
 class SimMotor {
     double kV, kT, r;
 
-    int setpoint;
+    double setpoint;
 
     // Current state
     double omega;
 
-public:
-    SimMotor(double kV, double kT, double r);
+    bool inverted;
 
-    void setInput(int pwm);
+public:
+    SimMotor(double kV, double kT, double r, bool inverted);
+
+    void setInput(double pwm);
     void setSpeed(double speed);
 
     [[nodiscard]] double getTorque() const;
