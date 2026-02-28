@@ -20,8 +20,14 @@ add_executable(441Sim main.cpp
         sim/SimRobot.cpp
         sim/SimRobot.h
         sim/SimMotor.cpp
-        sim/SimMotor.h)
+        sim/SimMotor.h
+        user/arduino/arduinoMain.cpp
+        user/wrappers/arduinoLib.cpp
+        user/wrappers/MotorWrapper.cpp
+)
 
 target_include_directories(441Sim PRIVATE ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(441Sim imgui glfw OpenGL::GL)
+
+target_compile_definitions(441Sim PUBLIC "SIM")

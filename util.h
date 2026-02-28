@@ -10,5 +10,4 @@ struct Pose {
     double y;
     double theta;
 };
-
 #endif //INC_441SIM_UTIL_H

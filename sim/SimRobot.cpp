@@ -3,6 +3,7 @@
 //
 
 #include "SimRobot.h"
+#include "../managers.h"
 
 SimRobot::SimRobot(Pose initialPose, const double dt) : sys(
     {chassisWidth, chassisDepth},
@@ -25,6 +26,7 @@ SimRobot::SimRobot(Pose initialPose, const double dt) : sys(
 
 void SimRobot::update(double& acc) {
     if (acc <= dt) return;
+
     // Need body frame velocities for kinematics
     const double c = cos(state.at(2));
     const double s = sin(state.at(2));
@@ -36,9 +38,7 @@ void SimRobot::update(double& acc) {
     const double omega_2 = (1 / wheelRadius) * (bVy + bVx + (sX + sY) * state.at(5));
     const double omega_3 = (1 / wheelRadius) * (bVy + bVx - (sX + sY) * state.at(5));
     const double omega_4 = (1 / wheelRadius) * (bVy - bVx + (sX + sY) * state.at(5));
-
-    // std::cout << omega_1 << std::endl;
-
+    
     motors.at(0).setSpeed(omega_1);
     motors.at(1).setSpeed(omega_2);
     motors.at(2).setSpeed(omega_3);
@@ -57,7 +57,7 @@ void SimRobot::update(double& acc) {
         acc -= dt;
     }
 
-    std::cout << state.at(1) << std::endl;
+    // After we do the physics update, we have to update encoder counts
 }
 
 state_t& SimRobot::getState() {

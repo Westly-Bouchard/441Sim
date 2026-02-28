@@ -17,6 +17,7 @@ using namespace std;
 
 #include "sim/SimRobot.h"
 
+#include "user/arduino/arduinoMain.h"
 
 int main() {
     const auto res = setUpRenderer("441Sim");
@@ -29,9 +30,12 @@ int main() {
         return 1;
     }
 
-    auto robot = SimRobot({1.5, 1.5, 0}, 0.002);
+    auto robot = SimRobot({2.5, 1.2, M_PI / 2.0}, 0.002);
 
-    double accumulator = 0.0;
+    // Run arduino setup routine
+    setup();
+
+    double simAccumulator= 0.0;
 
     auto lastTime = std::chrono::high_resolution_clock::now();
 
@@ -42,9 +46,7 @@ int main() {
         const double frame_dt = std::chrono::duration<double>(now - lastTime).count();
         lastTime = now;
 
-        accumulator += frame_dt;
-
-        // robot.setInputs(255, 255, 255, 255);
+        simAccumulator += frame_dt;
 
         if (ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
             robot.setInputs(255, 255, 255, 255);
@@ -58,8 +60,9 @@ int main() {
             robot.setInputs(0, 0, 0, 0);
         }
 
-        robot.update(accumulator);
+        loop();
 
+        robot.update(simAccumulator);
 
         /* RENDERING */
         glfwPollEvents();
