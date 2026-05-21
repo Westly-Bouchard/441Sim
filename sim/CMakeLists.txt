@@ -14,7 +14,6 @@ add_subdirectory(external)
 
 # Simulator core files
 aux_source_directory(src/hardware HARDWARE_SRC)
-aux_source_directory(src/plant PLANT_SRC)
 aux_source_directory(src/sim SIM_SRC)
 aux_source_directory(src/util UTIL_SRC)
 aux_source_directory(src/arduino ARDUINO_SRC)
@@ -25,7 +24,6 @@ aux_source_directory(userCode USER_SRC)
 # Simulator core static library
 add_library(simcore STATIC
     ${HARDWARE_SRC}
-    ${PLANT_SRC}
     ${SIM_SRC}
     ${UTIL_SRC}
     ${ARDUINO_SRC}

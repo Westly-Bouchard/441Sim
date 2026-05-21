@@ -8,8 +8,6 @@
 #include <ranges>
 #include <sstream>
 
-#include "plant/MecanumPlant.h"
-
 using namespace std;
 
 MecanumSim::MecanumSim(const WMRConfig &config)

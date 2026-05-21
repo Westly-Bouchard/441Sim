@@ -4,8 +4,6 @@
 
 #include "sim/TankSim.h"
 
-#include "plant/TankPlant.h"
-
 using namespace std;
 
 TankSim::TankSim(const WMRConfig &config) : config(config), noise(1.0, config.noiseMagnitude) {}
