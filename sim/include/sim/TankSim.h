@@ -34,9 +34,7 @@ public:
     void operator()(const state_t &x, state_t &dxdt, double t) override;
 
 protected:
-    void updateHardware() override;
-
-    void setPlantInputs() override;
+    void periodic() override;
 
 private:
     const WMRConfig config;

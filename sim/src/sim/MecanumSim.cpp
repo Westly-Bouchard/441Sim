@@ -13,12 +13,7 @@
 using namespace std;
 
 MecanumSim::MecanumSim(const WMRConfig &config)
-                        :  config(config) {
-    // Not sure why I can't just pass the config param
-    // Mecanum plant ctor also passes by const ref and copies
-    // So who knows why this doesn't work
-    this->plant = std::make_unique<MecanumPlant>(this->config);
-}
+                        :  config(config) {}
 
 void MecanumSim::setPose(const double x, const double y, const double theta) {
     state.at(0) = x;
@@ -26,7 +21,7 @@ void MecanumSim::setPose(const double x, const double y, const double theta) {
     state.at(2) = theta * (M_PI / 180.0);
 }
 
-void MecanumSim::updateHardware() {
+void MecanumSim::periodic() {
     // Update distance traveled by each wheel
     for (const auto vels = fwdKinematics(); auto&& [enc, vel] : views::zip((encoders), vels)) {
         enc->updatePosition(vel * dt);
@@ -36,15 +31,41 @@ void MecanumSim::updateHardware() {
     tof->update(state.at(0), state.at(1), state.at(2));
 }
 
-void MecanumSim::setPlantInputs() {
-    MecanumPlant::input_t torques;
+void MecanumSim::operator() (const state_t &x, state_t &dxdt, double t) {
+    input_t torques;
     // Wow I love modern C++ so much, this is so intelligible
     for (const auto vels = fwdKinematics(); auto &&[motor, vel, torque] : views::zip(
              motors, vels, torques)) {
         torque = motor->getTorque(vel);
     }
 
-    plant->setInputs(torques);
+    // Calculate forces in the body frame
+    const double bFx = (torques.at(0) + torques.at(1) + torques.at(2) +
+                        torques.at(3)) / config.wheelRadius;
+
+    const double bFy = (-torques.at(0) + torques.at(1) + torques.at(2) -
+                        torques.at(3)) / config.wheelRadius;
+
+    const double bTz = -(config.wheelBase / 2 + config.trackWidth / 2) * (torques.at(0) -
+                        torques.at(1) + torques.at(2) - torques.at(3)) /
+                        config.wheelRadius;
+
+    // Transform forces into the world frame
+    const double s = sin(x.at(2));
+    const double c = cos(x.at(2));
+
+    const double wFy = bFy * c + bFx * s;
+    const double wFx = bFx * c - bFy * s;
+    const double wTz = bTz;
+
+    // Update the derivative vector
+    dxdt.at(0) = x.at(3);
+    dxdt.at(1) = x.at(4);
+    dxdt.at(2) = x.at(5);
+
+    dxdt.at(3) = (1.0 / config.mass) * wFx;
+    dxdt.at(4) = (1.0 / config.mass) * wFy;
+    dxdt.at(5) = (1.0 / config.inertia) * wTz;
 }
 
 std::array<double, 4> MecanumSim::fwdKinematics() const {

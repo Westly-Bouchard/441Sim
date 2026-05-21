@@ -51,18 +51,14 @@ public:
 
     void registerTOF(TOFConfig c);
 
+    void operator()(const state_t &x, state_t &dxdt, double t) override;
+
 protected:
     /**
      * Update simulated hardware
      * Called only by parent class' update() method
      */
-    void updateHardware() override;
-
-    /**
-     * Update plant inputs
-     * Called only by parent class' update() method
-     */
-    void setPlantInputs() override;
+    void periodic() override;
 
 private:
     /**

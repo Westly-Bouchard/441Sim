@@ -10,7 +10,7 @@
 #include <functional>
 #include <thread>
 
-// Boos includes
+// Boost includes
 #include <boost/numeric/odeint.hpp>
 
 // Project Includes
@@ -20,7 +20,6 @@
 #include "SimulatorBase.h"
 #include "../util/Renderer.h"
 #include "../util/Telemetry.h"
-#include "../plant/Plant.hpp"
 #include "../hardware/SimClock.h"
 
 /**
@@ -65,10 +64,7 @@ public:
 
         while (acc > dt) {
             // Update hardware
-            updateHardware();
-
-            // Update plant inputs
-            // setPlantInputs();
+            periodic();
 
             // Step the physics sim
             // stepper.do_step(std::ref(*plant), state, simTime, dt);
@@ -88,18 +84,7 @@ protected:
      * Update the simulated hardware
      * To be implemented for a specific robot
      */
-    virtual void updateHardware() = 0;
-
-    /**
-     * Update plant inputs (torques, forces, etc.)
-     * To be implemented for a specific robot
-     */
-    virtual void setPlantInputs() = 0;
-
-    /**
-     * System dynamics
-     */
-    std::unique_ptr<Plant<numStates, numInputs>> plant;
+    virtual void periodic() = 0;
 
     /**
      * Current state of the system, example values could be:
@@ -110,7 +95,7 @@ protected:
      * - v_y    | Velocity of the robot in the world y direction
      * - omega  | Angular velocity of hte robot about world z
      */
-    Plant<numStates, numInputs>::state_t state{};
+    state_t state{};
 
     // Random number generator to be used when adding noise to a system
     std::mt19937 gen;

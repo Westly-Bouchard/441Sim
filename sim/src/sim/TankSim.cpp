@@ -8,9 +8,7 @@
 
 using namespace std;
 
-TankSim::TankSim(const WMRConfig &config) : config(config), noise(1.0, config.noiseMagnitude) {
-    this->plant = std::make_unique<TankPlant>(this->config);
-}
+TankSim::TankSim(const WMRConfig &config) : config(config), noise(1.0, config.noiseMagnitude) {}
 
 void TankSim::setPose(const double x, const double y, const double theta) {
     state.at(0) = x;
@@ -18,7 +16,7 @@ void TankSim::setPose(const double x, const double y, const double theta) {
     state.at(2) = theta * (M_PI / 180.0);
 }
 
-void TankSim::updateHardware() {
+void TankSim::periodic() {
     // Update encoders and TOF sensor
     const auto [wL, wR] = fwdKinematics(state);
 
@@ -54,62 +52,18 @@ void TankSim::updateHardware() {
     }
 }
 
-void TankSim::setPlantInputs() {
-    // const auto [wL, wR] = fwdKinematics();
-    // TankPlant::input_t torques;
-    //
-    // const double tL = leftMotor->getTorque(wL, noise(gen));
-    // const double tR = rightMotor->getTorque(wR, noise(gen));
-    //
-    // const double tFricL = config.kineticFriction * tanh(1000.0 * wL);
-    // const double tFricR = config.kineticFriction * tanh(1000.0 * wR);
-    //
-    // torques.at(0) = tL - tFricL;
-    // torques.at(1) = tR - tFricR;
-    //
-    // constexpr double VEL_STOP_THRESHOLD = 0.005;
-    //
-    // const bool leftPowered = leftMotor->getPWM() != 0;
-    // const bool rightPowered = rightMotor->getPWM() != 0;
-    //
-    // // If motors are unpowered and the system is still creeping (below the threshold above)
-    // // Then zero out it's velocity vector to ensure that it comes to a complete stop
-    // if (
-    //     !leftPowered &&
-    //     !rightPowered &&
-    //     abs(wL) < VEL_STOP_THRESHOLD &&
-    //     abs(wR) < VEL_STOP_THRESHOLD
-    // ) {
-    //     torques.at(0) = 0;
-    //     torques.at(1) = 0;
-    //
-    //     state.at(3) = 0;
-    //     state.at(4) = 0;
-    //     state.at(5) = 0;
-    // }
-    //
-    // plant->setInputs(torques);
-}
-
 void TankSim::operator()(const state_t &x, state_t &dxdt, const double t) {
     const auto [wL, wR] = fwdKinematics(x);
+
     // Calculate plant inputs
-    input_t torques;
-
-    const double tL = leftMotor->getTorque(wL, currentNoise.at(0));
-    const double tR = rightMotor->getTorque(wR, currentNoise.at(1));
-
-    const double tFricL = config.kineticFriction * tanh(1000.0 * wL);
-    const double tFricR = config.kineticFriction * tanh(1000.0 * wR);
-
-    torques.at(0) = tL - tFricL;
-    torques.at(1) = tR - tFricR;
+    const double tL = leftMotor->getTorque(wL, currentNoise.at(0)) - config.kineticFriction * tanh(1000.0 * wL);
+    const double tR = rightMotor->getTorque(wR, currentNoise.at(1)) - config.kineticFriction * tanh(1000.0 * wR);
 
     // Compute dynamics and update derivative vector
     // Calculate forces in the body frame
     // Force in the y direction is always zero (in this simplified case)
-    const double Fl = torques.at(0) / config.wheelRadius;
-    const double Fr = torques.at(1) / config.wheelRadius;
+    const double Fl = tL / config.wheelRadius;
+    const double Fr = tR / config.wheelRadius;
 
     const double bFx = Fl + Fr;
     const double bFy = 0;
