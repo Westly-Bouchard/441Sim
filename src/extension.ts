@@ -140,7 +140,7 @@ export function activate(context: vscode.ExtensionContext) {
                         "cppStandard": "c++23"
                     }
                 ]
-            }
+            };
             fs.writeFileSync(cppPropertiesPath, JSON.stringify(content));
         } catch (err) {
             vscode.window.showErrorMessage(`Failed to create c++ configuration file: ${err}`);
