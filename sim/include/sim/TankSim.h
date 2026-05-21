@@ -31,6 +31,8 @@ public:
 
     void registerTOF(TOFConfig c);
 
+    void operator()(const state_t &x, state_t &dxdt, double t) override;
+
 protected:
     void updateHardware() override;
 
@@ -38,6 +40,9 @@ protected:
 
 private:
     const WMRConfig config;
+
+    std::normal_distribution<> noise;
+    std::array<double, 2> currentNoise{};
 
     std::unique_ptr<SimMotor> rightMotor;
     std::unique_ptr<SimMotor> leftMotor;
@@ -47,7 +52,7 @@ private:
 
     std::unique_ptr<SimTOF> tof;
 
-    [[nodiscard]] std::array<double, 2> fwdKinematics() const;
+    [[nodiscard]] std::array<double, 2> fwdKinematics(const state_t& st) const;
     [[nodiscard]] std::array<double, 2> bodyToWorld(double x, double y) const;
 };
 

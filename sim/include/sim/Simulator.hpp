@@ -14,6 +14,8 @@
 #include <boost/numeric/odeint.hpp>
 
 // Project Includes
+#include <random>
+
 #include "../arduino/ArduinoRuntime.h"
 #include "SimulatorBase.h"
 #include "../util/Renderer.h"
@@ -31,11 +33,16 @@ public:
     // Why are there so many scopes. So, so many
     using stepper_t = boost::numeric::odeint::runge_kutta4<std::array<double, numStates>>;
 
+    using state_t = std::array<double, numStates>;
+    using input_t = std::array<double, numInputs>;
+
     /**
      * Construct simulator, calls Arduino `setup()` function
      * @param timestep Simulation timestep, default is 0.001 (1000Hz)
      */
-    explicit Simulator(const double timestep=0.001) : Drawable(0), TelemetryProvider(0), dt(timestep), simTime(0.0) {}
+    explicit Simulator(const double timestep = 0.001) : Drawable(0), TelemetryProvider(0), gen(std::random_device{}()),
+                                                        dt(timestep), simTime(0.0) {
+    }
 
     ~Simulator() override {
         // Stop user code thread and join
@@ -61,10 +68,11 @@ public:
             updateHardware();
 
             // Update plant inputs
-            setPlantInputs();
+            // setPlantInputs();
 
             // Step the physics sim
-            stepper.do_step(std::ref(*plant), state, simTime, dt);
+            // stepper.do_step(std::ref(*plant), state, simTime, dt);
+            stepper.do_step(std::ref(*this), state, simTime, dt);
             simTime += dt;
 
             // Update clock
@@ -72,6 +80,8 @@ public:
             acc -= dt;
         }
     }
+
+    virtual void operator() (const state_t &x, state_t &dx, double t) = 0;
 
 protected:
     /**
@@ -101,6 +111,9 @@ protected:
      * - omega  | Angular velocity of hte robot about world z
      */
     Plant<numStates, numInputs>::state_t state{};
+
+    // Random number generator to be used when adding noise to a system
+    std::mt19937 gen;
 
     /**
      * Timestep for the simulator

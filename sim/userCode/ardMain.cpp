@@ -72,6 +72,10 @@ std::unique_ptr<SimulatorBase> simInit() {
     config.showEncoderTelemetry = false;
     config.showTOFTelemetry = false;
 
+    config.kineticFriction = 0.05;
+
+    config.noiseMagnitude = 0.05;
+
     // Create robot
     auto robot = std::make_unique<TankSim>(config);
     robot->setPose(1, 1, 0);

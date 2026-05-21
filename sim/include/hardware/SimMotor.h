@@ -43,12 +43,16 @@ public:
      */
     [[nodiscard]] double getTorque(double speed);
 
+    [[nodiscard]] double getTorque(double speed, double noise);
+
     /**
      * Get the current speed of the motor
      * This will primarily be used to write telemetry
      * @return Current angular velocity of shaft
      */
     [[nodiscard]] double getSpeed() const;
+
+    [[nodiscard]] double getPWM() const;
 
 private:
     /**

@@ -8,7 +8,7 @@
 
 using namespace std;
 
-TankSim::TankSim(const WMRConfig &config) : config(config) {
+TankSim::TankSim(const WMRConfig &config) : config(config), noise(1.0, config.noiseMagnitude) {
     this->plant = std::make_unique<TankPlant>(this->config);
 }
 
@@ -19,31 +19,129 @@ void TankSim::setPose(const double x, const double y, const double theta) {
 }
 
 void TankSim::updateHardware() {
-    const auto [wL, wR] = fwdKinematics();
+    // Update encoders and TOF sensor
+    const auto [wL, wR] = fwdKinematics(state);
 
     leftEncoder->updatePosition(wL *dt);
     rightEncoder->updatePosition(wR *dt);
 
     tof->update(state.at(0), state.at(1), state.at(2));
+
+    // Generate noise for next physics update
+    // This must happen here because we want the noise to be constant across the rk4
+    // Update but, of course, we still want the noise to act as noise, and so it must be
+    // updated periodically
+    currentNoise = { noise(gen), noise(gen) };
+
+    // Force velocities to zero if under threshold
+    const bool leftPowered = leftMotor->getPWM() != 0;
+    const bool rightPowered = rightMotor->getPWM() != 0;
+
+    constexpr double GLOBAL_STOP_THRESHOLD = 0.01;
+
+    if (!leftPowered && !rightPowered) {
+        const double vx = state.at(3);
+        const double vy = state.at(4);
+        const double omega = state.at(5);
+
+        const double linear = sqrt(pow(vx, 2) + pow(vy, 2));
+
+        if (linear < GLOBAL_STOP_THRESHOLD && abs(omega) < GLOBAL_STOP_THRESHOLD) {
+            state.at(3) = 0;
+            state.at(4) = 0;
+            state.at(5) = 0;
+        }
+    }
 }
 
 void TankSim::setPlantInputs() {
-    const auto [wL, wR] = fwdKinematics();
-    TankPlant::input_t torques;
-    torques.at(0) = leftMotor->getTorque(wL);
-    torques.at(1) = rightMotor->getTorque(wR);
-
-    plant->setInputs(torques);
+    // const auto [wL, wR] = fwdKinematics();
+    // TankPlant::input_t torques;
+    //
+    // const double tL = leftMotor->getTorque(wL, noise(gen));
+    // const double tR = rightMotor->getTorque(wR, noise(gen));
+    //
+    // const double tFricL = config.kineticFriction * tanh(1000.0 * wL);
+    // const double tFricR = config.kineticFriction * tanh(1000.0 * wR);
+    //
+    // torques.at(0) = tL - tFricL;
+    // torques.at(1) = tR - tFricR;
+    //
+    // constexpr double VEL_STOP_THRESHOLD = 0.005;
+    //
+    // const bool leftPowered = leftMotor->getPWM() != 0;
+    // const bool rightPowered = rightMotor->getPWM() != 0;
+    //
+    // // If motors are unpowered and the system is still creeping (below the threshold above)
+    // // Then zero out it's velocity vector to ensure that it comes to a complete stop
+    // if (
+    //     !leftPowered &&
+    //     !rightPowered &&
+    //     abs(wL) < VEL_STOP_THRESHOLD &&
+    //     abs(wR) < VEL_STOP_THRESHOLD
+    // ) {
+    //     torques.at(0) = 0;
+    //     torques.at(1) = 0;
+    //
+    //     state.at(3) = 0;
+    //     state.at(4) = 0;
+    //     state.at(5) = 0;
+    // }
+    //
+    // plant->setInputs(torques);
 }
 
-std::array<double, 2> TankSim::fwdKinematics() const {
-    // Use current state to compute the velocities of the left and right wheels
-    const double wVx = state.at(3);
-    const double wVy = state.at(4);
-    const double wWz = state.at(5);
+void TankSim::operator()(const state_t &x, state_t &dxdt, const double t) {
+    const auto [wL, wR] = fwdKinematics(x);
+    // Calculate plant inputs
+    input_t torques;
 
-    const double s = sin(state.at(2));
-    const double c = cos(state.at(2));
+    const double tL = leftMotor->getTorque(wL, currentNoise.at(0));
+    const double tR = rightMotor->getTorque(wR, currentNoise.at(1));
+
+    const double tFricL = config.kineticFriction * tanh(1000.0 * wL);
+    const double tFricR = config.kineticFriction * tanh(1000.0 * wR);
+
+    torques.at(0) = tL - tFricL;
+    torques.at(1) = tR - tFricR;
+
+    // Compute dynamics and update derivative vector
+    // Calculate forces in the body frame
+    // Force in the y direction is always zero (in this simplified case)
+    const double Fl = torques.at(0) / config.wheelRadius;
+    const double Fr = torques.at(1) / config.wheelRadius;
+
+    const double bFx = Fl + Fr;
+    const double bFy = 0;
+    const double bTz = (config.trackWidth / 2.0) * (Fr - Fl);
+
+    // Transform forces into the world frame
+    const double s = sin(x.at(2));
+    const double c = cos(x.at(2));
+
+    const double wFx = bFx * c - bFy * s;
+    const double wFy = bFx * s + bFy * c;
+    const double wTz = bTz;
+
+    // Update the derivative vector
+    dxdt.at(0) = x.at(3);
+    dxdt.at(1) = x.at(4);
+    dxdt.at(2) = x.at(5);
+
+    // Update acceleration components of the derivative vector
+    dxdt.at(3) = (1.0 / config.mass) * wFx;
+    dxdt.at(4) = (1.0 / config.mass) * wFy;
+    dxdt.at(5) = (1.0 / config.inertia) * wTz;
+}
+
+std::array<double, 2> TankSim::fwdKinematics(const state_t& st) const {
+    // Use current state to compute the velocities of the left and right wheels
+    const double wVx = st.at(3);
+    const double wVy = st.at(4);
+    const double wWz = st.at(5);
+
+    const double s = sin(st.at(2));
+    const double c = cos(st.at(2));
 
     const double bVx = wVx * c + wVy * s;
 

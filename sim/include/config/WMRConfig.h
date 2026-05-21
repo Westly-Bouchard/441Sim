@@ -17,12 +17,19 @@ struct WMRConfig {
     const double wheelRadius;
     const double inertia;
 
+    double kineticFriction = 0.0;
+
+    // Optionally, add noise to the system
+    // This would generally be applied to the motor torques to model imperfect motors
+    // and an imperfect driving surface.
+    double noiseMagnitude = 0.0;
+
     // These allow unnecessary telemetry data to be turned off when a user is first experiencing the simulator
     bool showEncoderTelemetry = true;
     bool showTOFTelemetry = true;
 
     /**
-     * Construct a mecanum config object with provided physical constants
+     * Construct a WMR config object with provided physical constants
      * @param m Total mass of the robot in kilograms
      * @param tW Track width of the robot in meters
      * @param wB Wheelbase of the robot in meters
