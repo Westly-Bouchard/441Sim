@@ -69,4 +69,4 @@ and opens the simulator in a web browser (like it did with the demo), this is th
 you will use most.
 
 # Writing Your First Mosscap Sketch
-See the `Getting Started` section on the GitHub wiki!
+See the [Getting Started](https://github.com/Westly-Bouchard/Mosscap/wiki/Getting-Started) section on the GitHub wiki!
