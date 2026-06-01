@@ -1,105 +1,104 @@
-// #include <mosscap/defaultTank.h>
-// #include <Arduino.h>
-//
-// Motor lM(10);
-// Motor rM(11);
-//
-// void setup() {
-//     pinMode(1, INPUT);
-// }
-//
-// void loop() {
-//     if (digitalRead(1)) {
-//         lM.run(-150);
-//         rM.run(150);
-//     } else {
-//         lM.run(0);
-//         rM.run(0);
-//     }
-// }
+#include <mosscap/challenge1.h>
 
-#include <sim/TankSim.h>
-#include <Arduino.h>
 #include <Motor.h>
-
-std::unique_ptr<SimulatorBase> simInit();
-
-#define FORWARD_PIN 41
-#define TURN_LEFT_PIN 42
-#define TURN_RIGHT_PIN 43
-#define BACKWARD_PIN 44
 
 Motor left(11, 10, 12);
 Motor right(21, 20, 22);
 
-void run(int pwm) {
-    left.run(pwm);
-    right.run(pwm);
+double driveSpeed = 0.5; // Meters per second
+double turnSpeed = 275; // Degrees per second
+
+void driveDistance(double dist) {
+    // Convert from seconds to milliseconds as `delay()` takes a number of milliseconds
+    int time = int(dist / driveSpeed * 1000);
+    left.run(255);
+    right.run(255);
+
+    delay(time);
+
+    left.run(0);
+    right.run(0);
 }
 
-void turn(int pwm) {
-    left.run(-pwm);
-    right.run(pwm);
+void turnAngle(double angle) {
+    int time = abs(angle / turnSpeed * 1000);
+
+    if (angle > 0) {
+        left.run(-255);
+        right.run(255);
+    } else {
+        left.run(255);
+        right.run(-255);
+    }
+
+    delay(time);
+
+    left.run(0);
+    right.run(0);
 }
 
 void setup() {
-    pinMode(FORWARD_PIN, INPUT);
-    pinMode(BACKWARD_PIN, INPUT);
-    pinMode(TURN_LEFT_PIN, INPUT);
-    pinMode(TURN_RIGHT_PIN, INPUT);
+    // Set up button
+    pinMode(1, INPUT);
 }
+
+// To keep track of which direction we're currently facing
+double angle = 0;
 
 void loop() {
-    if (digitalRead(FORWARD_PIN)) {
-        run(200);
-    } else if (digitalRead(BACKWARD_PIN)) {
-        run(-200);
-    } else if (digitalRead(TURN_LEFT_PIN)) {
-        turn(200);
-    } else if (digitalRead(TURN_RIGHT_PIN)) {
-        turn(-200);
-    } else {
-        run(0);
+
+    // Wait for user to press the button
+    while (!digitalRead(1)) {}
+    while (digitalRead(1)) {}
+
+    // For each point in the list: turn towards it and drive there
+    for (int i = 0; i < pathPoints.size(); i++) {
+        // Determine current and target positions
+        double currentX = pathPoints[i][0];
+        double currentY = pathPoints[i][1];
+
+        double targetX, targetY;
+        if (i == pathPoints.size() - 1) {
+            targetX = pathPoints[0][0];
+            targetY = pathPoints[0][1];
+        } else {
+            targetX = pathPoints[i + 1][0];
+            targetY = pathPoints[i + 1][1];
+        }
+
+        // Calculate number of degrees to turn
+        // Convert to degrees
+        double targetAngle = atan2(targetY - currentY, targetX - currentX) / PI * 180.0;
+
+        double angleDelta = targetAngle - angle;
+
+        // Ensure that we don't turn more than we need to (turn 90 to the left instead of 270 to the right)
+        if (abs(angleDelta) > 180.0) {
+            if (angleDelta > 0) {
+                angleDelta -= 180.0;
+            } else {
+                angleDelta += 180.0;
+            }
+
+            angleDelta *= -1;
+        }
+
+        std::cout << "Current Angle: " << angle << std::endl;
+        std::cout << "Target Angle: " << targetAngle << std::endl;
+        std::cout << "Angle Delta: " << angleDelta << std::endl;
+        std::cout << "Current Position: (" << currentX << ", " << currentY << ")" << std::endl;
+        std::cout << "Target Position: (" << targetX << ", " << targetY << ")" << std::endl;
+
+        // Turn the robot
+        turnAngle(angleDelta);
+
+        // Update our current angle for the next iteration of the loop
+        angle = targetAngle;
+
+        // Calculate distance to drive
+        double dist = sqrt(pow(targetX - currentX, 2) + pow(targetY - currentY, 2));
+
+        // Move the robot
+        driveDistance(dist);
     }
-}
-
-std::unique_ptr<SimulatorBase> simInit() {
-    // Set rendering scale
-    Renderer::setScale(2.0);
-
-    // Configuration of the robot
-    WMRConfig config{2.0 /*kg*/, 0.20 /*m*/, 0.15 /*m*/, 0.04 /*m*/};
-    config.showEncoderTelemetry = false;
-    config.showTOFTelemetry = false;
-
-    config.kineticFriction = 0.05;
-
-    config.noiseMagnitude = 0.05;
-
-    // Create robot
-    auto robot = std::make_unique<TankSim>(config);
-    robot->setPose(1, 1, 0);
-
-    TOFConfig tofConfig{0, 0, 0};
-    tofConfig.boundingBox = BoundingBox(3, 3);
-
-    robot->registerTOF(tofConfig);
-
-    // Configuration of motors
-    // In theory you could have a different config for each motor if you wanted
-    // But in this case each motor is exactly the same
-    const MotorConfig mConfig{3.1, 0.1245, 2.3, 6.0};
-
-    robot->registerLeftMotor(mConfig, 10);
-    robot->registerRightMotor(mConfig, 20);
-
-    robot->registerLeftEncoder(1500, 20);
-    robot->registerRightEncoder(1500, 21);
-
-    ArduinoRuntime::getInstance().createButton("Forward", 41);
-    ArduinoRuntime::getInstance().createButton("Backward", 44);
-    ArduinoRuntime::getInstance().createButton("Left", 42);
-    ArduinoRuntime::getInstance().createButton("Right", 43);
-
-    return robot;
 }

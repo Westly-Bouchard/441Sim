@@ -12,7 +12,7 @@
 
 void drawPath();
 
-inline std::unique_ptr<SimulatorBase> simInit() {
+std::unique_ptr<SimulatorBase> simInit() {
     // Set rendering scale
     Renderer::setScale(3.0);
     Renderer::getInstance().registerDrawFunction(-2, drawPath);
@@ -21,12 +21,12 @@ inline std::unique_ptr<SimulatorBase> simInit() {
     config.showEncoderTelemetry = false;
     config.showTOFTelemetry = false;
 
-    config.kineticFriction = 0.05;
+    config.kineticFriction = 0.1;
 
     config.noiseMagnitude = 0.1;
 
     // Create robot
-    auto robot = std::make_unique<TankSim>(defaultRobot);
+    auto robot = std::make_unique<TankSim>(config);
     robot->setPose(0.6, 0.75, 0);
 
     TOFConfig tofConfig{0, 0, 0};
@@ -59,8 +59,8 @@ static constexpr std::array<std::array<double, 2>, 8> pathPoints = {{
 inline void drawPath() {
     std::array<ImVec2, pathPoints.size() + 1> vertices;
     for (auto&& [p, v] : std::views::zip(pathPoints, vertices)) {
-        v.x = p.at(0) * pxPerMeter + 400;
-        v.y = p.at(1) * pxPerMeter + 400;
+        v.x = p.at(0) * pxPerMeter;
+        v.y = 3.0 * pxPerMeter - p.at(1) * pxPerMeter;
     }
 
     // This is kind of hacky but whatever
