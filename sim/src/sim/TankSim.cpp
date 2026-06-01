@@ -53,9 +53,16 @@ void TankSim::periodic() {
 void TankSim::operator()(const state_t &x, state_t &dxdt, const double t) {
     const auto [wL, wR] = fwdKinematics(x);
 
+    const double s = sin(x.at(2));
+    const double c = cos(x.at(2));
+
     // Calculate plant inputs
     const double tL = leftMotor->getTorque(wL, currentNoise.at(0)) - config.kineticFriction * tanh(1000.0 * wL);
     const double tR = rightMotor->getTorque(wR, currentNoise.at(1)) - config.kineticFriction * tanh(1000.0 * wR);
+
+    // Body frame y velocity. This should always be as close to zero as possible, so we'll try to force it there
+    const double bVx = x.at(3) * c + x.at(4) * s;
+    const double bVy = x.at(4) * c - x.at(3) * s;
 
     // Compute dynamics and update derivative vector
     // Calculate forces in the body frame
@@ -64,13 +71,10 @@ void TankSim::operator()(const state_t &x, state_t &dxdt, const double t) {
     const double Fr = tR / config.wheelRadius;
 
     const double bFx = Fl + Fr;
-    const double bFy = 0;
+    const double bFy = config.mass * x.at(5) * bVx - 1000.0 * bVy;
     const double bTz = (config.trackWidth / 2.0) * (Fr - Fl);
 
     // Transform forces into the world frame
-    const double s = sin(x.at(2));
-    const double c = cos(x.at(2));
-
     const double wFx = bFx * c - bFy * s;
     const double wFy = bFx * s + bFy * c;
     const double wTz = bTz;

@@ -52,6 +52,8 @@ private:
 
     [[nodiscard]] std::array<double, 2> fwdKinematics(const state_t& st) const;
     [[nodiscard]] std::array<double, 2> bodyToWorld(double x, double y) const;
+
+    int pwmL{0}, pwmR{0};
 };
 
 
