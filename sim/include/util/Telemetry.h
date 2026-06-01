@@ -143,7 +143,14 @@ public:
     virtual void write() const = 0;
 
     void update() override {
+        /*
+         * In the case that the TelemetryProvider is running in the Arduino thread,
+         * we must lock the object when writing to synchronize the threads before
+         * writing.
+         */
+        linkMtx.lock();
         write();
+        linkMtx.unlock();
     }
 
 protected:
