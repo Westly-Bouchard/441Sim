@@ -34,14 +34,14 @@ public:
      * @param pwm Signed speed between -255 and 255
      */
     void run(const int pwm) const {
-        ArduinoRuntime::getInstance().getPWM(pin).get().writePWM(pwm);
+        ArduinoRuntime::getInstance().setPwm(pin, pwm);
     }
 
     /**
      * Stop the motor by writing pwm zero
      */
     void stop() const {
-        ArduinoRuntime::getInstance().getPWM(pin).get().writePWM(0);
+        ArduinoRuntime::getInstance().setPwm(pin, 0);
     }
 
 private:

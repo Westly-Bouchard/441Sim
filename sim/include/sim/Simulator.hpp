@@ -63,12 +63,18 @@ public:
         }
 
         while (acc > dt) {
+            // Lock the Arduino Runtime to prevent things like PWM changes during the physics update
+            ArduinoRuntime::getInstance().freeze();
+
             // Update hardware
             periodic();
 
             // Step the physics sim
-            // stepper.do_step(std::ref(*plant), state, simTime, dt);
             stepper.do_step(std::ref(*this), state, simTime, dt);
+
+            // Unfreeze as soon as possible
+            ArduinoRuntime::getInstance().unfreeze();
+
             simTime += dt;
 
             // Update clock

@@ -12,6 +12,7 @@
 #define PI M_PI
 
 #include <memory>
+#include <mutex>
 
 #include "Handle.hpp"
 #include "Wire.h"
@@ -49,6 +50,11 @@ public:
     ArduinoRuntime(const ArduinoRuntime&) = delete;
     ArduinoRuntime& operator=(const ArduinoRuntime&) = delete;
 
+    // This interface should really only be available to the simulator, not to user code
+    // I'm not really sure how to fix this tbh
+    void freeze();
+    void unfreeze();
+
     /**
      * Make a certain pin PWM writeable by the user's code
      * @param pin Pin to bind
@@ -83,6 +89,8 @@ public:
      */
     [[nodiscard]] Handle<WriteablePWM> getPWM(int pin) const;
 
+    void setPwm(int pin, int pwm);
+
     /**
      * Get a handle to an encoder to read its value
      * @param pin Pin capability is bound to
@@ -108,6 +116,8 @@ private:
      */
     ArduinoRuntime();
     ~ArduinoRuntime() = default;
+
+    std::mutex m;
 
     /**
      * Maps that store motors and encoders by their bound pins

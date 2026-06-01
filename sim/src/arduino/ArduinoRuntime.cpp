@@ -17,6 +17,14 @@ ArduinoRuntime &ArduinoRuntime::getInstance() {
     return instance;
 }
 
+void ArduinoRuntime::freeze() {
+    m.lock();
+}
+
+void ArduinoRuntime::unfreeze() {
+    m.unlock();
+}
+
 void ArduinoRuntime::bindPWM(const int pin, WriteablePWM &pwm) {
     pwmMap.emplace(pin, Handle{pwm});
 }
@@ -46,6 +54,12 @@ bool ArduinoRuntime::getDigitalInputState(const int pin) const {
 
 Handle<WriteablePWM> ArduinoRuntime::getPWM(const int pin) const {
     return pwmMap.at(pin);
+}
+
+void ArduinoRuntime::setPwm(const int pin, const int pwm) {
+    m.lock();
+    pwmMap.at(pin).get().writePWM(pwm);
+    m.unlock();
 }
 
 Handle<ReadableEncoder> ArduinoRuntime::getEncoder(const int pin) const {
