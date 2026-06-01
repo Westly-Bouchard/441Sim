@@ -64,8 +64,9 @@ void Renderer::draw() const {
             it->second();
             ++it;
         }
-
+        d->lock();
         d->draw();
+        d->unlock();
     }
 
     while (it != drawFunctions.end()) {

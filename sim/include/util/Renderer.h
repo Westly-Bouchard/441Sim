@@ -154,6 +154,9 @@ public:
      */
     virtual void draw() const = 0;
 
+    void lock() { drawMtx.lock(); }
+    void unlock() { drawMtx.unlock(); }
+
 protected:
     /**
      * Included so that objects that run in the Arduino thread can be drawable
