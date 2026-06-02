@@ -34,7 +34,8 @@ void Telemetry::write() const {
     // Begin telemetry window
     ImGui::SetNextWindowPos(ImVec2(800, 0));
     ImGui::SetNextWindowSize(ImVec2(480, 800));
-    ImGui::Begin("Telemetry", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("Telemetry", nullptr,
+                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 
     writing = true;
 
