@@ -207,6 +207,8 @@ struct TOFConfig {
     BoundingBox boundingBox;
     std::vector<std::shared_ptr<Object>> obstacles{};
 
+    bool detectBoundingBox{false};
+
     TOFConfig(const double x, const double y, const double theta) : x(x), y(y), theta(theta), boundingBox(0, 0) {}
 };
 
