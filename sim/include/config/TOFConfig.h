@@ -123,7 +123,7 @@ struct Box : Object {
 
         for (auto&& [v, p] : std::views::zip(vertices, points)) {
             p.x = pos.x + (v.x * c - v.y * s);
-            p.y = pos.y - (v.x * s + v.y * c);
+            p.y = pos.y + (v.x * s + v.y * c);
         }
 
         lines = {{
