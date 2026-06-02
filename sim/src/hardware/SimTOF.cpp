@@ -23,7 +23,9 @@ void SimTOF::update(const double x, const double y, const double theta) {
     const double wX = config.x * cos(theta) - config.y * sin(theta) + x;
     const double wY = config.x * sin(theta) + config.y * cos(theta) + y;
 
-    double tempDist = std::numeric_limits<double>::max();
+    // double tempDist = std::numeric_limits<double>::max();
+
+    double tempDist = 1'000'000.0;
 
     // why did I do it this way
     const Vec origin{wX, wY}, direction{cos(wTheta), sin(wTheta)};
