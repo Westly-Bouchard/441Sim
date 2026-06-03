@@ -79,6 +79,12 @@ private:
     ~Telemetry() = default;
 
     /**
+     * Used to synchronize threads when DataLinks exist within user code.
+     * Similar to the mutex in the Renderer.
+     */
+    mutable std::mutex m;
+
+    /**
      * The vector of providers
      */
     std::vector<std::pair<int, DataLink*>> providers;

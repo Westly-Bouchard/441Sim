@@ -17,6 +17,7 @@ Telemetry& Telemetry::getInstance() {
 }
 
 void Telemetry::registerDataLink(const int priority, DataLink *provider) {
+    std::lock_guard lock(m);
     providers.emplace_back(priority, provider);
 
     std::ranges::sort(providers, [](const auto& a, const auto& b) {
@@ -25,12 +26,14 @@ void Telemetry::registerDataLink(const int priority, DataLink *provider) {
 }
 
 void Telemetry::unregisterDataLink(DataLink *provider) {
+    std::lock_guard lock(m);
     erase_if(providers, [provider](const auto& p) {
         return provider == p.second;
     });
 }
 
 void Telemetry::write() const {
+    std::lock_guard lock(m);
     // Begin telemetry window
     ImGui::SetNextWindowPos(ImVec2(800, 0));
     ImGui::SetNextWindowSize(ImVec2(480, 800));
