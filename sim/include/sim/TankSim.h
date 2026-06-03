@@ -17,7 +17,7 @@ class TankSim : public Simulator<6, 2> {
 public:
     explicit TankSim(const WMRConfig &config);
 
-    void draw() const override;
+    void draw() override;
 
     void write() const override;
 

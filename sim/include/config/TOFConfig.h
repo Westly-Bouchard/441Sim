@@ -87,7 +87,7 @@ struct Line : Object {
         return std::nullopt;
     }
 
-    void draw() const override {}
+    void draw() override {}
 };
 
 /**
@@ -147,7 +147,7 @@ struct Box : Object {
         return minDist;
     }
 
-    void draw() const override {
+    void draw() override {
         Renderer::drawRect(pos.x, pos.y, theta, w, h, {255, 0, 0});
     }
 
@@ -191,7 +191,7 @@ struct BoundingBox : Box {
         return minDist;
     }
 
-    void draw() const override {}
+    void draw() override {}
 };
 
 /**

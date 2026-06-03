@@ -101,7 +101,7 @@ void MecanumSim::registerTOF(TOFConfig c) {
     ArduinoRuntime::getInstance().bindTOF(*tof);
 }
 
-void MecanumSim::draw() const {
+void MecanumSim::draw() {
     // Draw robot
     Renderer::drawRect(state.at(0), state.at(1), state.at(2), 0.200, 0.245, {255, 255, 255});
 }

@@ -145,7 +145,7 @@ void TankSim::registerTOF(TOFConfig c) {
     ArduinoRuntime::getInstance().bindTOF(*tof);
 }
 
-void TankSim::draw() const {
+void TankSim::draw() {
     // Here I assume that the wheels are 3cm wide
     const double chassisWidth = config.trackWidth - 0.03;
 
@@ -158,6 +158,26 @@ void TankSim::draw() const {
         chassisWidth,
         {0xf5, 0xf5, 0xf5}
     );
+
+    // If the user wants to see time of flight telemetry
+    if (config.showTOFTelemetry) {
+        double dist = tof->getDist();
+
+        if (dist > scale) {
+            dist = scale;
+        }
+
+        const auto [tofLineX, tofLineY] = bodyToWorld(dist / 2.0 , 0);
+
+        Renderer::drawRect(
+            tofLineX,
+            tofLineY,
+            state.at(2),
+            dist,
+            0.0075,
+            {50, 75, 238}
+        );
+    }
 
     // Mark the forward direction with an arrow
     const double arrowLength = config.wheelBase * 0.75;

@@ -152,7 +152,7 @@ public:
     /**
      * Draw function to be implemented by derived classes
      */
-    virtual void draw() const = 0;
+    virtual void draw() = 0;
 
     void lock() { drawMtx.lock(); }
     void unlock() { drawMtx.unlock(); }

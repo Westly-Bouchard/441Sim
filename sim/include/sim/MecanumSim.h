@@ -29,7 +29,7 @@ public:
     /**
      * Draw robot state to ImGui window
      */
-    void draw() const override;
+    void draw() override;
 
     /**
      * Write telemetry data to ImGui window
