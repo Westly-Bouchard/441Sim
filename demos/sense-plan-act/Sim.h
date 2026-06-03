@@ -7,7 +7,7 @@
 #include <memory>
 
 void drawGoalSquare() {
-    Renderer::drawRect(2.5, 2.5, 0.0, 0.2, 0.2, {0.0f, 1.0f, 0.25f});
+    Renderer::drawRect(1.8, 2.6, 0.0, 0.2, 0.2, {0.0f, 1.0f, 0.25f});
 }
 
 std::unique_ptr<SimulatorBase> simInit() {

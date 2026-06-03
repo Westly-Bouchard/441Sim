@@ -36,8 +36,8 @@ const double MAP_RESOLUTION = 0.1;
 const double START_X = 0.5;
 const double START_Y = 0.5;
 
-const double GOAL_X = 2.5;
-const double GOAL_Y = 2.5;
+const double GOAL_X = 1.8;
+const double GOAL_Y = 2.65;
 
 const double MAX_MOVE_DIST = 0.5;
 
