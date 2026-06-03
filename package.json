@@ -3,7 +3,7 @@
   "name": "mosscap",
   "displayName": "Mosscap",
   "description": "A simulator for Arduino based educational robots",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "engines": {
     "vscode": "^1.118.0"
   },
