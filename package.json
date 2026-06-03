@@ -28,6 +28,11 @@
         "command": "mosscap.demo",
         "title": "Open Demo",
         "category": "Mosscap"
+      },
+      {
+        "command": "mosscap.demoSPA",
+        "title": "Open Demo: Sense-Plan-Act",
+        "category": "Mosscap"
       }
     ]
   },

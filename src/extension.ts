@@ -192,9 +192,27 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    let openDemoSPA = vscode.commands.registerCommand('mosscap.demoSPA', async () => {
+        try {
+            const demoPath = path.join(context.extensionPath, 'demos', 'sense-plan-act');
+            await buildSimulator(demoPath, context);
+
+            const port = await startSimulatorServer(demoPath);
+
+            const localUrl = vscode.Uri.parse(`http://127.0.0.1:${port}/sim.html`);
+            await vscode.env.openExternal(localUrl);
+
+            vscode.window.showInformationMessage(`Simulator running in browser on port ${port}`);
+
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to start demo: ${error}`);
+        }
+    });
+
     context.subscriptions.push(init);
     context.subscriptions.push(simStart);
     context.subscriptions.push(openDemo);
+    context.subscriptions.push(openDemoSPA);
 }
 
 export function deactivate() {
