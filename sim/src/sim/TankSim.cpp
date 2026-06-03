@@ -145,7 +145,7 @@ void TankSim::registerTOF(TOFConfig c) {
     ArduinoRuntime::getInstance().bindTOF(*tof);
 }
 
-void TankSim::draw() {
+void TankSim::draw() const {
     // Here I assume that the wheels are 3cm wide
     const double chassisWidth = config.trackWidth - 0.03;
 
