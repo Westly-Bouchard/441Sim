@@ -17,6 +17,7 @@ Renderer& Renderer::getInstance() {
 }
 
 void Renderer::registerDrawable(const int layer, Drawable* drawable) {
+    lock_guard lock(m);
     // Push object into tracked vector
     drawables.emplace_back(layer, drawable);
 
@@ -27,6 +28,7 @@ void Renderer::registerDrawable(const int layer, Drawable* drawable) {
 }
 
 void Renderer::registerDrawFunction(const int layer, const function<void()>& func) {
+    lock_guard lock(m);
     drawFunctions.emplace_back(layer, func);
 
     ranges::sort(drawFunctions, [](const auto& a, const auto& b) {
@@ -35,6 +37,7 @@ void Renderer::registerDrawFunction(const int layer, const function<void()>& fun
 }
 
 void Renderer::unregisterDrawable(Drawable* drawable) {
+    lock_guard lock(m);
     erase_if(drawables, [drawable](const auto& d) { return drawable == d.second; });
 }
 
@@ -44,6 +47,7 @@ void Renderer::setScale(const double meters) {
 }
 
 void Renderer::draw() const {
+    lock_guard lock(m);
     // Begin visualization window
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);

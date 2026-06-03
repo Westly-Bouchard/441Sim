@@ -99,6 +99,16 @@ private:
     ~Renderer() = default;
 
     /**
+     * Used to synchronize threads when drawable objects exist within user code.
+     * This is primarily an issue if a `Drawable` object goes out of scope in the Arduino
+     * thread and the Renderer attempts to `draw` it before it has finished de-registering
+     * itself from the Renderer.
+     *
+     * Note: Use of mutable here to allow locking in `const` member functions
+     */
+    mutable std::mutex m;
+
+    /**
      * Vectors of things to draw, be they objects or functions to call
      */
     std::vector<std::pair<int, Drawable*>> drawables;
