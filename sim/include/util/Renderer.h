@@ -162,10 +162,7 @@ public:
     /**
      * Draw function to be implemented by derived classes
      */
-    virtual void draw() {};
-
-    void lock() { drawMtx.lock(); }
-    void unlock() { drawMtx.unlock(); }
+    virtual void draw() const {};
 
 protected:
     /**
@@ -173,7 +170,7 @@ protected:
      * Right now it's the responsibility of the implementer to properly
      * synchronize threads when drawing, even though that's not ideal.
      */
-    std::mutex drawMtx;
+    mutable std::mutex drawMtx;
 
 private:
     int l;

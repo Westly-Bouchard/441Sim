@@ -20,7 +20,7 @@ public:
         }
     }
 
-    void draw() override {
+    void draw() const override {
         std::lock_guard lk(drawMtx);
         for (int y = 0; y < numElements; y++) {
             for (int x = 0; x < numElements; x++) {

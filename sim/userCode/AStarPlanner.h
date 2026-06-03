@@ -113,7 +113,7 @@ public:
         return ret;
     }
 
-    void draw() override {
+    void draw() const override {
         static int counter = 0;
         // Lock draw mutex
         std::unique_lock lk(drawMtx);
@@ -171,8 +171,8 @@ private:
     std::unordered_map<Location, Location> cameFrom;
     std::unordered_map<Location, double> costSoFar;
 
-    std::condition_variable cv;
-    bool step{false};
+    mutable std::condition_variable cv;
+    mutable bool step{false};
 
     std::atomic_bool solved{false};
     std::vector<Location> path{};
