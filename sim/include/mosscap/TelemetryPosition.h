@@ -15,12 +15,12 @@
  * telemetry window automatically, allowing for easy debugging and analysis of odometry
  * implementations.
  */
-class TelemetryPose : public TelemetryProvider {
+class TelemetryPosition : public TelemetryProvider {
 public:
     /**
      * Create position object
      */
-    TelemetryPose() : TelemetryProvider(1) {}
+    TelemetryPosition() : TelemetryProvider(1) {}
 
     /**
      * Get the current stored X position
