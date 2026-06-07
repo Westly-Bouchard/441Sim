@@ -1,72 +1,36 @@
+<div align="center">
+    <img src='media/Mosscap-SPA-Demo.gif' alt='Sense plan act demo' style="width: 75%;"/>
+    <p style="width: 70%;">A small demo that showcases a simulated robot mapping its environment, path planning with A*, and executing the first few moves in the path.</p>
+</div>
+
+
 # Mosscap
 
-Mosscap is a simulation platform for Arduino based robots like [these](https://osoyoo.com/2022/07/05/v2-metal-chassis-mecanum-wheel-robotic-for-arduino-mega2560-introduction-model-2021006600/). The goal of this project is to provide
-a tool that can be used for robotics education from high school through college. Essentially,
-Mosscap addresses the following problem statement:
+Put simply: Mosscap is a simulator for Arduino based robots. But, more broadly, Mosscap aims to be a friction-less, accessible tool for robotics education.
 
-> Robotics hardware is often prohibitively expensive. Even simple wheeled mobile robot kits that
-> can be purchased on Amazon can exceed $100 in cost, which puts them out of reach for many students
-> or hobbyists.
-> 
-> Additionally, many software-based educational tools and simulators provide their own barriers to
-> entry in the form of complicated installation and usage patterns, along with large amounts of
-> assumed prerequisite knowledge for their use.
-> 
-> Naturally, the question arises: How might one create an educational robotics platform that is
-> simple to install and use, and that can leverage users' existing knowledge to provide educational
-> opportunities without such barriers to entry?
+Learning robotics can be incredibly difficult because it is so interdisciplinary. At the same time, hardware (even simple starter kits on Amazon) can be prohibitively expensive, and most robotics simulators are not designed with beginners in mind. These existing tools are incredibly powerful, but they assume that the user possesses a great amount of prerequisite knowledge. In practice, this means that robotics learners must learn foundational robotics theory in parallel with the tools to apply it. While this can have some advantages, it can also be incredibly overwhelming. 
 
-Mosscap addresses this problem by packaging a lightweight physics simulator and Arduino interface
-into a Visual Studio Code extension to allow for simple installation. It leverages WebAssembly through
-emscripten to compile a user's Arduino sketch and open the simulation interface in browser.
+Broadly, these factors combine to create a formidable set of barriers to entry into robotics as a field.
 
-This circumvents the hassle of c++ build systems and dependency management and simplifies the usage
-requirements to two simple items:
-1. Do you have a computer?
-2. Can that computer run VS Code?
+Mosscap aims to remove some of these barriers by significantly reducing the complexity of tooling and eliminating the cost of hardware. It provides a VS Code extension that packages a browser-based simulator with an Arduino interface and a set of semi-guided programming challenges to introduce fundamental robotics concepts.
 
-If the answer to both of these is yes, then you can use Mosscap to start learning robotics.
+By leveraging learners' previous Arduino experience (still a barrier, but a significantly smaller one) and providing a simplified interface which abstracts away the complexity of C++ tool-chains and build systems, Mosscap serves as an ideal entry point for learners; allowing them to explore and build confidence without feeling overwhelmed.
 
-# The Basics
-## Installation
-First, you have to install VS Code if you haven't already. Instructions for this can be
-found through the [VS Code Documentation](https://code.visualstudio.com/docs/setup/setup-overview).
+# Installation
+Mosscap runs inside of VS Code, the industry standard text / code editor. Instructions for its installation can be found through the [VS Code Documentation](https://code.visualstudio.com/docs/setup/setup-overview).
 
-Next, you can install Mosscap from the [VS Code Extensions Marketplace](https://marketplace.visualstudio.com/items?itemName=westly-bouchard.mosscap). You should also install the [C/C++
-Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack) (or the regular [C/C++ Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) either one should work just fine).
+Additionally, Mosscap relies on the [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) extension. See the [Documentation](https://code.visualstudio.com/docs/configure/extensions/extensions) for more information about installing extensions.
 
-> Note that you can install extensions from within VS Code from the extensions tab (on the left), or
-> by pressing `Ctrl/Cmd+Shift+X`.
-## Opening the Demo
-Mosscap provides a quick demo that you can run right out of the box, without writing any code.
+Finally, the Mosscap extension can be installed from the extensions tab. That's it!
+# Opening the Demo
+To ensure that everything is working properly Mosscap provides a demo that you can run right out of the box. Hit `Ctrl/Cmd+Shift+P` to open the command palette, search "Mosscap: Open Demo", and hit enter.
 
-Open the command palette (hit `Ctrl/Cmd+Shift+P`, or click the search bar at the top middle of the window), type `Mosscap: Open Demo`, and hit enter. Here's what will happen next:
+The first time you do this, the extension will download and install the necessary tools to compile and run the simulator. This may take a couple of minutes, depending on the speed of your internet connection and computer.
 
-1. Mosscap will download and install the necessary tools to compile and run the simulator.
-This may take a couple of minutes, depending on the speed of your internet connection and
-your machine.
+After this, the demo sketch should open in your system's default internet browser. Take a minute or two to play around with it. The different buttons in the telemetry window will cause the robot to move in different ways in the simulated environment.
 
-2. Mosscap will compile the [demo sketch](https://github.com/Westly-Bouchard/Mosscap/blob/main/demos/intro/ardMain.cpp). The extension should pop open an output terminal where it reports the commands it's
-running.
+Here's the cool part, this behavior is all coming from an Arduino sketch! The sketch can tell if you're pressing a button by calling `digitalRead()`, and it tells the motors on the robot to run with `motor.run()`, just like you would do with an actual Arduino.
+# Start Learning
+Now that you're all set up, it's time to start coding! Head to the [Getting Started](https://github.com/Westly-Bouchard/Mosscap/wiki/Getting-Started) page on the GitHub wiki to learn how to set up a new sketch.
 
-3. Mosscap will open the simulator in your web browser. Now, it's time to have some fun!
-
-Take a few minutes to play around with the demo. This demo features a simple tank (differential)
-drive robot that is wired up to some buttons. Notice that pressing the button labeled `Forward`
-will cause the robot to drive forward.
-
-Here's the cool part, this is all running from a simple Arduino sketch!
-
-## Extension Interface
-Besides opening the demo, the Mosscap extension provides two commands for you to use:
-
-1. `Mosscap: Initialize Environment` -> This is used when you first create a sketch, it tells VS Code
-where to look for libraries and tools to provide IntelliSense while you're writing code.
-In other words, this makes those annoying red squiggles go away.
-
-2. `Mosscap: Start Simulator` -> This command compiles the sketch you currently have open,
-and opens the simulator in a web browser (like it did with the demo), this is the command
-you will use most.
-
-# Writing Your First Mosscap Sketch
-See the [Getting Started](https://github.com/Westly-Bouchard/Mosscap/wiki/Getting-Started) section on the GitHub wiki!
+After that, check out the series of provided coding challenges designed to teach you the basics of robot programming.
