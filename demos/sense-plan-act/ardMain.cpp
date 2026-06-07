@@ -61,7 +61,7 @@ Encoder eR(R_E_A, R_E_B);
 VL53L0X tof;
 
 // Current position of the robot from odometry calculations
-TelemetryPose pose;
+TelemetryPosition pose;
 
 // Current global obstacle map
 TelemetryMap map(MAP_SIZE, MAP_RESOLUTION);

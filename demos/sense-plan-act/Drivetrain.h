@@ -4,7 +4,9 @@
 #include <Encoder.h>
 #include <Motor.h>
 
-#include "TelemetryPosition.h"
+#include <mosscap/TelemetryPosition.h>
+
+// #include "TelemetryPosition.h"
 #include "Trajectory.h"
 
 // Some important physical constants from the robot
@@ -21,7 +23,7 @@
 #define TURN_V_MAX 180
 #define TURN_A_MAX 360
 
-void updateOdometry(TelemetryPose& pose, Encoder& eL, Encoder& eR) {
+void updateOdometry(TelemetryPosition& pose, Encoder& eL, Encoder& eR) {
     const int leftCounts = eL.readAndReset();
     const int rightCounts = eR.readAndReset();
 
@@ -40,7 +42,7 @@ void updateOdometry(TelemetryPose& pose, Encoder& eL, Encoder& eR) {
 }
 
 // Drive forward using a trapezoidal trajectory
-void driveDistance(double distMeters, Motor& mL, Motor& mR, TelemetryPose& pose, Encoder& eL, Encoder& eR) {
+void driveDistance(double distMeters, Motor& mL, Motor& mR, TelemetryPosition& pose, Encoder& eL, Encoder& eR) {
     Trajectory traj(distMeters, FORWARD_V_MAX, FORWARD_A_MAX);
 
     int lastTime = millis();
@@ -70,7 +72,7 @@ void driveDistance(double distMeters, Motor& mL, Motor& mR, TelemetryPose& pose,
 }
 
 // Turn to a specified angle using a trapezoidal trajectory
-void turnAngle(double angleDegrees, Motor& mL, Motor& mR, TelemetryPose& pose, Encoder& eL, Encoder& eR) {
+void turnAngle(double angleDegrees, Motor& mL, Motor& mR, TelemetryPosition& pose, Encoder& eL, Encoder& eR) {
     Trajectory traj(abs(angleDegrees), TURN_V_MAX, TURN_A_MAX);
 
     int lastTime = millis();

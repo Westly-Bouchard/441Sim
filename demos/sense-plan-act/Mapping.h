@@ -18,7 +18,7 @@ void initTof(VL53L0X& tof) {
     }
 }
 
-void updateMap(TelemetryPose& pose, TelemetryMap& map, VL53L0X& tof, Motor& mL, Motor& mR, Encoder& eL, Encoder& eR) {
+void updateMap(TelemetryPosition& pose, TelemetryMap& map, VL53L0X& tof, Motor& mL, Motor& mR, Encoder& eL, Encoder& eR) {
     mL.run(-100);
     mR.run(100);
 
