@@ -2,7 +2,6 @@ name: Build C++ Simulator and Package Extension
 
 on:
     push:
-        branches: [ "main" ]
     workflow_dispatch:
 
 jobs:
