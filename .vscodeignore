@@ -4,6 +4,7 @@ sim/**
 build/**
 node_modules/**
 src/**
+media/**
 .gitignore
 
 tsconfig.json
