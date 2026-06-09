@@ -14,6 +14,7 @@ std::unique_ptr<SimulatorBase> simInit() {
     Renderer::setScale(2.0);
 
     auto config = defaultRobot;
+    config.showMotorTelemetry = false;
     config.showTOFTelemetry = false;
 
     config.kineticFriction = 0.1;

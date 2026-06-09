@@ -18,6 +18,7 @@ std::unique_ptr<SimulatorBase> simInit() {
     Renderer::getInstance().registerDrawFunction(-2, drawPath);
 
     auto config = defaultRobot;
+    config.showMotorTelemetry = false;
     config.showEncoderTelemetry = false;
     config.showTOFTelemetry = false;
 
