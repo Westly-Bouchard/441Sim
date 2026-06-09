@@ -255,16 +255,18 @@ void TankSim::write() const {
         Telemetry::text(ss.str());
     }
 
-    if (Telemetry::section("Motors")) {
-        ss.str("");
-        ss << "Left Setpoint (PWM):  " << leftMotor->getPWM();
-        Telemetry::text(ss.str());
+    if (config.showMotorTelemetry) {
+        if (Telemetry::section("Motors")) {
+            ss.str("");
+            ss << "Left Setpoint (PWM):  " << leftMotor->getPWM();
+            Telemetry::text(ss.str());
 
-        ss.str("");
+            ss.str("");
 
-        ss << "Right Setpoint (PWM): " << rightMotor->getPWM();
-        Telemetry::text(ss.str());
-        ss.str("");
+            ss << "Right Setpoint (PWM): " << rightMotor->getPWM();
+            Telemetry::text(ss.str());
+            ss.str("");
+        }
     }
 
     if (config.showEncoderTelemetry) {
