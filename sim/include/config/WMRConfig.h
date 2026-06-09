@@ -25,6 +25,7 @@ struct WMRConfig {
     double noiseMagnitude = 0.0;
 
     // These allow unnecessary telemetry data to be turned off when a user is first experiencing the simulator
+    bool showMotorTelemetry = true;
     bool showEncoderTelemetry = true;
     bool showTOFTelemetry = true;
 
