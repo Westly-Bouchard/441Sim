@@ -4,7 +4,7 @@
 #include <VL53L0X.h>
 #include <Wire.h>
 
-#include "TelemetryMap.h"
+#include <mosscap/TelemetryMap.h>
 
 #include "Drivetrain.h"
 
