@@ -1,54 +1,94 @@
-#include "mosscap/challenge4.h"
+#include "mosscap/challenge5.h"
 
-#include <Wire.h>
-#include <VL53L0X.h>
+void setup() {
+    // Mapping button
+    pinMode(1, INPUT);
 
-VL53L0X tof;
+    // Planning button
+    pinMode(2, INPUT);
 
-const double mapSize = 3.0;
-const double mapResolution = 0.1;
+    // Set initial position
+    pose.setX(0.5);
+    pose.setY(0.5);
+}
 
-TelemetryMap map(mapSize, mapResolution);
+AStarPlanner planner(map);
 
-void updateMap() {
-    double currentAngle = pose.getTheta();
+bool AStarPlanner::takeSolutionStep() {
+    // Get the next node to check from the frontier
+    Location current = popFromFrontier();
 
-    double dist = tof.readRangeSingleMillimeters() / 1000.0;
+    // If we're at the goal, return true
+    if (current == goal) {
+        return true;
+    }
 
-    double thetaRadians = currentAngle * PI / 180.0;
+    // For each of the node's neighbors, including diagonals
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            if (dx != 0 || dy != 0) {
+                // Compute the location of the neighbor
+                Location next(current.x + dx, current.y + dy);
 
-    double globalX = pose.getX() + dist * cos(thetaRadians);
-    double globalY = pose.getY() + dist * sin(thetaRadians);
+                // If that location is within the bounds of our map
+                if (next.x >= 0 && next.x < map.getNumElements() && next.y >= 0 && next.y < map.getNumElements()) {
+                    // And, if there is no obstacle at that location
+                    if (!map.get(next.x, next.y)) {
+                        // Calculate the cost to this location
+                        double newCost = costSoFar.at(current) + cost(current, next);
 
-    int mapX = floor(globalX / mapResolution);
-    int mapY = floor(globalY / mapResolution);
+                        // If we've never visited this cell before, or if this cost is lower than the previous cost at this location
+                        if (!costSoFar.contains(next) || newCost < costSoFar.at(next)) {
+                            // Update the cost in our dictionary
+                            costSoFar[next] = newCost;
 
-    for (int rOffset = -1; rOffset <= 1; rOffset++) {
-        for (int cOffset = -1; cOffset <= 1; cOffset++) {
-            map.set(mapX + cOffset, mapY + rOffset);
+                            // Calculate the priority for this node
+                            double priority = newCost + heuristic(next, goal);
+
+                            // Place the node into the frontier
+                            frontier.emplace(priority, next);
+
+                            // Update our `cameFrom` dictionary so that we know which node is this node's parent
+                            cameFrom[next] = current;
+                        }
+                    }
+                }
+            }
         }
     }
 
-    map.set(mapX, mapY);
+    return false;
 }
 
-void setup() {
-    // Buttons to move the robot around (forward, left, and right)
-    pinMode(1, INPUT);
-
-    // Set initial position
-    pose.setX(1.5);
-    pose.setY(1.5);
-
-    // Initialize time of flight sensor
-    // These lines don't actually do anything, they're just here for realism
-    // This is how you would set up a VL530X using its Arduino library if you=
-    // were working with actual hardware.
-    Wire.begin();
-    tof.setTimeout(500);
-    if (!tof.init()) {
-        while (1) {}
+vector<Location> AStarPlanner::reconstructPath() {
+    // If we didn't end up finding a valid path, we can just return an empty vector
+    if (!cameFrom.contains(goal)) {
+        return {};
     }
+
+    // We trace our path backwards from the goal, so we start at the goal
+    Location current = goal;
+
+    // Stores our path
+    vector<Location> path;
+
+    // While we're not at the start
+    while (current != start) {
+        // Put the current node in our path
+        path.push_back(current);
+
+        // Update the current node to this node's parent
+        current = cameFrom.at(current);
+    }
+
+    // Now we have to reverse the path so we can follow it from start to finish
+    vector<Location>  pathReversed;
+
+    for (int i = path.size() - 1; i >= 0; i--) {
+        pathReversed.push_back(path[i]);
+    }
+
+    return pathReversed;
 }
 
 void loop() {
@@ -57,4 +97,13 @@ void loop() {
     while (digitalRead(1)) {}
 
     performMappingSweep();
+
+    while (!digitalRead(2)) {}
+    while (digitalRead(2)) {}
+
+    Location current{5, 5};
+    Location goal {18, 26};
+
+    planner.reset(current, goal);
+    auto _ = planner.solve();
 }
